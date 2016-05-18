@@ -31,7 +31,7 @@
 
 
             this.load.image('arrow', 'images/arrow.png');
-            this.load.bitmapFont('shmupfont', 'images/shmupfont.png', 'assets/shmupfont.xml');
+            this.load.bitmapFont('shmupfont', 'images/shmupfont.png', 'images/shmupfont.xml');
 
             //  Note: Graphics are not for use in any commercial project
 

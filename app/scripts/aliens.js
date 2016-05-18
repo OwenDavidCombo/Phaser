@@ -28,16 +28,10 @@
         },
 
         preload: function () {
+            
+            this.load.image('alien', 'images/ufo.png');
+            this.load.bitmapFont('shmupfont', 'images/shmupfont.png', 'images/shmupfont.xml');
 
-            //  We need this because the assets are on Amazon S3
-            //  Remove the next 2 lines if running locally
-            // this.load.baseURL = 'http://files.phaser.io.s3.amazonaws.com/codingtips/issue008/';
-            this.load.crossOrigin = 'anonymous';
-
-            this.load.image('alien', 'assets/ufo.png');
-            this.load.bitmapFont('shmupfont', 'assets/shmupfont.png', 'assets/shmupfont.xml');
-
-            //  Note: Graphics are not for use in any commercial project
 
         },
 
