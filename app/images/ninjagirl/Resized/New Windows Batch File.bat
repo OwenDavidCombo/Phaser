@@ -1,0 +1,1 @@
+mogrify -resize 60x60 -quality 100 *.png
