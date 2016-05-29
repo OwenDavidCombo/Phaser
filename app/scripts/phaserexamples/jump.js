@@ -6,17 +6,14 @@
         this.player = null;
         this.platforms = null;
         this.sky = null;
-        this.scoreText = null;
 
         this.facing = 'left';
         this.edgeTimer = 0;
         this.jumpTimer = 0;
-        this.time=null;
-        
+
         this.wasStanding = false;
         this.cursors = null;
-        this.score=0;
-       
+
     };
 
     PhaserGame.prototype = {
@@ -29,13 +26,10 @@
 
             this.physics.startSystem(Phaser.Physics.ARCADE);
 
-            this.physics.arcade.gravity.y = 0;
-            
+            this.physics.arcade.gravity.y = 750;
             this.physics.arcade.skipQuadTree = false;
 
         },
-
-        
 
         preload: function () {
 
@@ -60,25 +54,44 @@
             this.add.sprite(0, 1906, 'trees');
 
             this.platforms = this.add.physicsGroup();
-           
-            this.addPlatforms(this);
-            this.timer = game.time.events.loop(19000, this.addPlatforms, this);         
-            
-            
+
+            var x = 0;
+            var y = 64;
+
+            for (var i = 0; i < 100; i++)
+            {
+                var type = i % 2 === 1 ? 'platform' : 'ice-platform';
+                var platform = this.platforms.create(x, y, type);
+
+                //  Set a random speed between 50 and 200
+                platform.body.velocity.x = this.rnd.between(100, 150);
+
+                //  Inverse it?
+                if (Math.random() > 0.5)
+                {
+                    platform.body.velocity.x *= -1;
+                }
+
+                x += 200;
+
+                if (x >= 600)
+                {
+                    x = 0;
+                }
+
+                y+= 104;
+            }
 
             this.platforms.setAll('body.allowGravity', false);
             this.platforms.setAll('body.immovable', true);
-            this.platforms.setAll.checkWorldBounds = true;
-            this.platforms.setAll.outOfBoundsKill = true;
 
-            this.player = this.add.sprite(430, 1652, 'dude');
+            this.player = this.add.sprite(320, 1952, 'dude');
 
             this.physics.arcade.enable(this.player);
 
             this.player.body.collideWorldBounds = true;
             this.player.body.setSize(20, 32, 5, 16);
-           this.player.body.gravity.y =750;
-            
+
             this.player.animations.add('left', [0, 1, 2, 3], 10, true);
             this.player.animations.add('turn', [4], 20, true);
             this.player.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -86,9 +99,7 @@
             this.camera.follow(this.player);
 
             this.cursors = this.input.keyboard.createCursorKeys();
-            this.score=0;
-            this.scoreText = this.add.text(16, game.world.height-49, 'score:' +this.score, { fontSize: '32px', fill: '#000' });
-            this.scoretimer = game.time.events.loop(10, this.Score, this); 
+
         },
 
         wrapPlatform: function (platform) {
@@ -101,19 +112,9 @@
             {
                 platform.x = -160;
             }
-            else if (platform.y<0){
-                
-            }
     
         },
-        
-        Score: function(score,scoreText){
-           this.score += 10;
-           
-            this.scoreText.text = 'Score: ' + this.score;
-            
-        },
-        
+
         setFriction: function (player, platform) {
 
             if (platform.key === 'ice-platform')
@@ -123,71 +124,19 @@
 
         },
 
-        addPlatforms: function(x, y) {
-            var x = 0;
-            var y = 0;
-
-            for (var i = 0; i < 20; i++)
-            {
-                 //  Inverse it?
-                if (Math.random() > 0.5)
-                {
-                   var type='platform';
-                   
-                }else{type='ice-platform';}
-                
-
-                var platform = this.platforms.create(x, y, type);
-
-               platform.body.velocity.x = 0;
-                platform.body.velocity.y = 100;
-               platform.body.immovable=true;
-     
-                //  Inverse it?
-                if (Math.random() > 0.5)
-                {
-                    platform.body.velocity.x *= -1;
-                   
-                }
-
-                 x +=  200;
-                if (x >= 600)
-                {
-                    x =  50;
-                }
-
-                y+= 104;
-            }
-        },
-        
-        
         update: function () {
 
-            if (this.player.y > game.world.height-49)
-                game.state.start('Game'); 
-            
             this.sky.tilePosition.y = -(this.camera.y * 0.7);
 
             this.platforms.forEach(this.wrapPlatform, this);
-            
-            if (this.player.body.velocity.x < 0 && this.player.x <= 10)
-            {
-                this.player.x = 640;
-            }
-            else if (this.player.body.velocity.x > 0 && this.player.x >= 600)
-            {
-                this.player.x = -130;
-            }
-            
+
             this.physics.arcade.collide(this.player, this.platforms, this.setFriction, null, this);
 
             //  Do this AFTER the collide check, or we won't have blocked/touching set
             var standing = this.player.body.blocked.down || this.player.body.touching.down;
 
             this.player.body.velocity.x = 0;
-            
-            
-            
+
             if (this.cursors.left.isDown)
             {
                 this.player.body.velocity.x = -200;

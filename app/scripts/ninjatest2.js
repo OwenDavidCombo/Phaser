@@ -45,8 +45,8 @@
             this.load.image('clouds', 'images/phaserexamples/clouds.png');
             this.load.image('platform', 'images/phaserexamples/platform (2).png');
             this.load.image('ice-platform', 'images/phaserexamples/ice-platform.png');
-            this.load.spritesheet('dude', 'images/phaserexamples/dude.png', 32, 48);
-
+            //this.load.spritesheet('dude', 'images/phaserexamples/dude.png', 32, 48);
+            this.load.atlasJSONHash('dude', 'images/ninjagirl/ninjagirl.png', 'images/ninjagirl/ninjagirl.json');
 
         },
 
@@ -79,10 +79,15 @@
             this.player.body.setSize(20, 32, 5, 16);
            this.player.body.gravity.y =750;
             
-            this.player.animations.add('left', [0, 1, 2, 3], 10, true);
-            this.player.animations.add('turn', [4], 20, true);
-            this.player.animations.add('right', [5, 6, 7, 8], 10, true);
+            this.player.animations.add('left', [81, 82, 83, 84, 85, 86, 87, 88, 89, 90], 10, true);
+            
+            //this.player.animations.add('left', [0, 1, 2, 3], 10, true);
+            //this.player.animations.add('turn', [4], 20, true);
+            //this.player.animations.add('right', [5, 6, 7, 8], 10, true);
 
+            this.player.animations.add('right', [81, 82, 83, 84, 85, 86, 87, 88, 89, 90], 10, true); 
+            this.player.animations.add('jump', [70, 71, 72, 73, 74, 75, 76, 77, 78, 79], 5, true);    
+            
             this.camera.follow(this.player);
 
             this.cursors = this.input.keyboard.createCursorKeys();
@@ -195,6 +200,7 @@
                 if (this.facing !== 'left')
                 {
                     this.player.play('left');
+                    this.player.scale.x = -1;
                     this.facing = 'left';
                 }
             }
@@ -205,6 +211,7 @@
                 if (this.facing !== 'right')
                 {
                     this.player.play('right');
+                    this.player.scale.x = 1;
                     this.facing = 'right';
                 }
             }
@@ -220,7 +227,7 @@
                     }
                     else
                     {
-                        this.player.frame = 5;
+                        this.player.frame = 85;
                     }
 
                     this.facing = 'idle';
@@ -238,6 +245,7 @@
             if ((standing || this.time.time <= this.edgeTimer) && this.cursors.up.isDown && this.time.time > this.jumpTimer)
             {
                 this.player.body.velocity.y = -500;
+                this.player.play('jump');
                 this.jumpTimer = this.time.time + 750;
             }
 
