@@ -1,5 +1,18 @@
 
-    var game = new Phaser.Game(640, 480, Phaser.CANVAS, 'game');
+    var accelerationY;
+    window.ondevicemotion = function(event) {  
+
+        accelerationY = event.accelerationIncludingGravity.y;  
+
+    } 
+    
+    var jump;
+    window.onclick = function(event) {  
+        jump = true;
+
+    }  
+    
+    var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, 'game');
 
     var PhaserGame = function () {
 
@@ -25,7 +38,7 @@
 
             this.game.renderer.renderSession.roundPixels = true;
 
-            this.world.resize(640, 2000);
+            this.world.resize(window.innerWidth, window.innerHeight*3);
 
             this.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -52,13 +65,16 @@
 
         create: function () {
 
+            game.inputenabled=true;
+             game.input.addPointer();
             this.stage.backgroundColor = '#2f9acc';
 
-            this.sky = this.add.tileSprite(0, 0, 640, 480, 'clouds');
+            this.sky = this.add.tileSprite(0, 0, window.innerWidth, window.innerHeight, 'clouds');
             this.sky.fixedToCamera = true;
 
-            this.add.sprite(0, 1906, 'trees');
-
+            this.trees = this.add.sprite(0, (window.innerHeight*3)-(game.cache.getImage('trees').height),'trees');
+            this.trees.width = window.innerWidth;
+            
             this.platforms = this.add.physicsGroup();
            
             this.addPlatforms(this);
@@ -71,7 +87,7 @@
             this.platforms.setAll.checkWorldBounds = true;
             this.platforms.setAll.outOfBoundsKill = true;
 
-            this.player = this.add.sprite(430, 1652, 'dude');
+            this.player = this.add.sprite(100, (window.innerHeight*2), 'dude');
 
             this.physics.arcade.enable(this.player);
 
@@ -129,16 +145,13 @@
         },
 
         addPlatforms: function(x, y) {
-            var x = 0;
+            var x = 50;
             var y = 0;
 
             for (var i = 0; i < 20; i++)
             {
                  //  Inverse it?
-                if (Math.random() > 0.5)
-                {
-                   var type='platform';
-                   
+                if (Math.random() > 0.5){var type='platform';                   
                 }else{type='ice-platform';}
                 
 
@@ -147,7 +160,9 @@
                platform.body.velocity.x = 0;
                 platform.body.velocity.y = 100;
                platform.body.immovable=true;
-     
+            platform.width = window.innerWidth/3-100;
+            
+                
                 //  Inverse it?
                 if (Math.random() > 0.5)
                 {
@@ -155,8 +170,8 @@
                    
                 }
 
-                 x +=  200;
-                if (x >= 600)
+                 x +=  window.innerWidth/3;
+                if (x >= window.innerWidth)
                 {
                     x =  50;
                 }
@@ -177,9 +192,9 @@
             
             if (this.player.body.velocity.x < 0 && this.player.x <= 10)
             {
-                this.player.x = 640;
+                this.player.x = window.innerWidth;
             }
-            else if (this.player.body.velocity.x > 0 && this.player.x >= 600)
+            else if (this.player.body.velocity.x > 0 && this.player.x >= window.innerWidth-40)
             {
                 this.player.x = -130;
             }
@@ -191,9 +206,28 @@
 
             this.player.body.velocity.x = 0;
             
-            
-            
-            if (this.cursors.left.isDown)
+            if(accelerationY>0){
+                this.player.body.velocity.x = 200;
+
+                if (this.facing !== 'right')
+                {
+                    this.player.play('right');
+                    this.player.scale.x = 1;
+                    this.facing = 'right';
+                }
+                
+            }
+            else if(accelerationY<0){
+                this.player.body.velocity.x = -200;
+
+                if (this.facing !== 'left')
+                {
+                    this.player.play('left');
+                    this.player.scale.x = -1;
+                    this.facing = 'left';
+                }
+            }            
+            else if (this.cursors.left.isDown)
             {
                 this.player.body.velocity.x = -200;
 
@@ -240,14 +274,17 @@
             {
                 this.edgeTimer = this.time.time + 250;
             }
-
+            
             //  Allowed to jump?
-            if ((standing || this.time.time <= this.edgeTimer) && this.cursors.up.isDown && this.time.time > this.jumpTimer)
+            if ((standing || this.time.time <= this.edgeTimer) && (this.cursors.up.isDown || jump) && this.time.time > this.jumpTimer)
             {
                 this.player.body.velocity.y = -500;
                 this.player.play('jump');
                 this.jumpTimer = this.time.time + 750;
+                jump = null;
             }
+            else{jump = null;}
+
 
             this.wasStanding = standing;
 

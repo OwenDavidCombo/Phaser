@@ -71,7 +71,7 @@
             this.platforms.setAll.checkWorldBounds = true;
             this.platforms.setAll.outOfBoundsKill = true;
 
-            this.player = this.add.sprite(430, 1652, 'dude');
+            this.player = this.add.sprite(100, 1652, 'dude');
 
             this.physics.arcade.enable(this.player);
 
